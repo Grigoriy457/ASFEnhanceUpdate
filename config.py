@@ -6,6 +6,8 @@ config = dotenv_values(".env")
 ASF_HOSTS = config.get("ASF_HOSTS").split(",")
 ASF_PASSWORD = config.get("ASF_PASSWORD")
 
+STEAM_SESSION_ID = config.get("STEAM_SESSION_ID")
+
 FARM_AT_UTC_TIME = config.get("FARM_AT_UTC_TIME")
 
 LOGGING_LEVEL = logging.INFO
