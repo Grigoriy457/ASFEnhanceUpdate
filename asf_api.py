@@ -1,7 +1,22 @@
 import aiohttp
 import json
+from dataclasses import dataclass
 
 import config
+
+
+@dataclass
+class ExecuteCommand:
+    status_code: int
+    success: bool
+    result: str
+    message: str
+
+
+class ASFError(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+        self.message = message
 
 
 class AsfApi:
@@ -20,12 +35,26 @@ class AsfApi:
         }
         async with aiohttp.ClientSession() as session:
             async with session.post(f"{self.base_api_url}/Command", headers=headers, data=json.dumps(data)) as response:
-                return await response.json()
+                if response.status in (500, 503):
+                    raise ASFError(f"ASF is not available. Status code: {response.status} (command={command})")
 
+                data = await response.json()
+                return ExecuteCommand(
+                    status_code=response.status,
+                    success=data["Success"],
+                    result=data["Result"],
+                    message=data["Message"]
+                )
 
-async def test():
-    asf_api = AsfApi("10.10.10.57:80")
-    print(await asf_api.execute_command("explorer asf"))
+    async def explorer(self):
+        ret = await self.execute_command("explorer ASF")
+        if not ret.success:
+            raise ASFError(f"ASF explorer error: {ret.result}")
+
+    async def loot(self):
+        ret = await self.execute_command("loot ASF")
+        if not ret.success:
+            raise ASFError(f"ASF loot error: {ret.result}")
 
 
 if __name__ == "__main__":
