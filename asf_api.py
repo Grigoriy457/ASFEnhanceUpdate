@@ -57,6 +57,11 @@ class AsfApi:
             raise ASFError(f"ASF loot error: {ret.result}")
 
 
+async def test():
+    asf_api = AsfApi("10.10.10.57:80")
+    print(await asf_api.execute_command("help"))
+
+
 if __name__ == "__main__":
     import asyncio
     asyncio.run(test())
