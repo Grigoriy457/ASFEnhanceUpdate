@@ -16,6 +16,12 @@ class SteamItem:
     instance_id: int
 
 
+class SteamException(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+        self.message = message
+
+
 class SteamApi:
     def __init__(self):
         self.app_id = APP_ID
@@ -70,14 +76,16 @@ class SteamApi:
         }
         async with aiohttp.ClientSession() as session:
             async with session.post(f"{self.base_url}/market/sellitem", headers=headers, data=aiohttp.FormData(data)) as response:
-                return await response.json()
+                data = await response.json()
+                if not data["success"]:
+                    raise SteamException(f"Error in sell item: {data['message']}")
 
 
 async def test():
     steam_api = SteamApi()
     steam_api.app_id = "2923300"
     steam_api.context_id = "2"
-    pprint(await steam_api.sell_item("4855525049031940705", 2))
+    await steam_api.sell_item("4855525049031940705", 2)
 
 
 if __name__ == '__main__':
