@@ -13,7 +13,7 @@ CONTEXT_ID = "6"
 @dataclass
 class SteamItem:
     name: str
-    market_hash_name: str
+    instance_id: int
 
 
 class SteamApi:
@@ -23,7 +23,7 @@ class SteamApi:
 
     async def get_inventory(self, steam_id):
         def is_card(tags):
-            return "item_class" in [tag["category"] for tag in tags]
+            return dict([(tag["category"], tag["internal_name"]) for tag in tags]).get("item_class") == "item_class_2"
 
         params = {
             "l": "russian",
@@ -32,18 +32,25 @@ class SteamApi:
         async with aiohttp.ClientSession() as session:
             async with session.get(f"{self.base_url}/inventory/{steam_id}/{APP_ID}/{CONTEXT_ID}", params=params) as response:
                 data = await response.json()
-                items = [
-                    SteamItem(name=item["name"], market_hash_name=item["market_hash_name"])
-                    for item in data["descriptions"]
-                    if is_card(item["tags"]) and item["marketable"]
-                ]
+                descriptions = dict([(description["instanceid"], description) for description in data["descriptions"]])
+                items = []
+                for item in data["assets"]:
+                    steam_item = SteamItem(name=descriptions[item["instanceid"]]["name"], instance_id=item["instanceid"])
+                    if steam_item in items:
+                        continue
+                    if is_card(descriptions[item["instanceid"]]["tags"]) and descriptions[item["instanceid"]]["marketable"]:
+                        items.append(steam_item)
+
                 return items
 
-    async def sell_item(self):
+    async def sell_item(self, asset_id, price):
         data = {
             "sessionid": self.session_id,
             "appid": APP_ID,
             "contextid": CONTEXT_ID,
+            "assetid": asset_id,
+            "amount": 1,
+            "price": price
         }
         async with aiohttp.ClientSession() as session:
             async with session.post(f"{self.base_url}/market/sellitem", data=json.dumps(data)) as response:
