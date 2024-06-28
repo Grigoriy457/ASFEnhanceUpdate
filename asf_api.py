@@ -6,6 +6,13 @@ import config
 
 
 @dataclass
+class Bot:
+    bot_name: str
+    nickname: str
+    is_enabled: bool
+
+
+@dataclass
 class ExecuteCommand:
     status_code: int
     success: bool
@@ -23,6 +30,23 @@ class AsfApi:
     def __init__(self, host):
         self.base_api_url = f"http://{host}/Api"
         self.password = config.ASF_PASSWORD
+
+    async def get_bots(self):
+        headers = {
+            "accept": "application/json",
+            "Authentication": self.password,
+            "Content-Type": "application/json"
+        }
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"{self.base_api_url}/Bot/ASF", headers=headers) as response:
+                if response.status in (500, 503):
+                    raise ASFError(f"ASF is not available. Status code: {response.status}")
+
+                data = await response.json()
+                return [
+                    Bot(bot_name=bot["BotName"], nickname=bot["Nickname"], is_enabled=bot["IsConnectedAndLoggedOn"])
+                    for bot in data["Result"].values()
+                ]
 
     async def execute_command(self, command):
         headers = {

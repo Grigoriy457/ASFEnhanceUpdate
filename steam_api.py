@@ -13,7 +13,7 @@ CONTEXT_ID = "6"
 @dataclass
 class SteamItem:
     name: str
-    instance_id: int
+    asset_id: str
 
 
 class SteamException(Exception):
@@ -47,22 +47,15 @@ class SteamApi:
                 descriptions = dict([(description["instanceid"], description) for description in data["descriptions"]])
                 items = []
                 for item in data["assets"]:
-                    steam_item = SteamItem(name=descriptions[item["instanceid"]]["name"], instance_id=item["instanceid"])
+                    steam_item = SteamItem(name=descriptions[item["instanceid"]]["name"], asset_id=item["assetid"])
                     if steam_item in items:
                         continue
                     if is_card(descriptions[item["instanceid"]]["tags"]) and descriptions[item["instanceid"]]["marketable"]:
                         items.append(steam_item)
-
                 return items
 
     async def sell_item(self, asset_id: str, price: int):
         headers = {
-            "Accept": "*/*",
-            "Accept-Encoding": "gzip, deflate",
-            "Accept-Language": "ru-RU,ru;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6",
-            "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
-            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
             "Cookie": f"sessionid={self.session_id}; steamLoginSecure={self.login_secure}",
             "Referer": f"https://steamcommunity.com/profiles/{self.steam_id}/inventory"
         }
@@ -85,7 +78,7 @@ async def test():
     steam_api = SteamApi()
     steam_api.app_id = "2923300"
     steam_api.context_id = "2"
-    await steam_api.sell_item("4855525049031940705", 2)
+    await steam_api.sell_item("4855525049032158018", 200)
 
 
 if __name__ == '__main__':
