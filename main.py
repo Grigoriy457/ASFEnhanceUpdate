@@ -1,5 +1,4 @@
 import asyncio
-from pprint import pprint
 
 import config
 from main_logger import get_logger
@@ -15,10 +14,10 @@ async def process(asf_host):
     bots = await asf_api.get_bots()
     online_bots_count = len([bot for bot in bots if bot.is_enabled])
 
-    await asf_api.explorer()
-    logger.info(f"[+] Explore ASF {asf_host} done")
-    await asyncio.sleep(30)
-    await asf_api.loot()
+    # await asf_api.explorer()
+    # logger.info(f"[+] Explore ASF {asf_host} done")
+    # await asyncio.sleep(30)
+    # await asf_api.loot()
     logger.info(f"[+] Loot ASF {asf_host} done")
 
     return online_bots_count
@@ -28,7 +27,6 @@ async def main(attempt=1):
     logger.info("[/] Starting processes...")
     online_bots_count = sum(await asyncio.gather(*[process(asf_host) for asf_host in config.ASF_HOSTS]))
     logger.info("[+] All processes done!")
-    online_bots_count = 16
 
     steam_api = SteamApi()
     items = await steam_api.get_inventory()
@@ -37,9 +35,13 @@ async def main(attempt=1):
         return False
 
     for i, item in enumerate(items, start=1):
-
-        # await steam_api.sell_item(asset_id=item.asset_id, price=1)
+        price = await steam_api.get_lowest_item_price(market_hash_name=item.market_hash_name)
+        await steam_api.sell_item(asset_id=item.asset_id, price=price)
         logger.info(f"[+] #{i}/{len(items)} Item sold: {item.name}")
+
+    asf_api = AsfApi(config.ASF_MAIN_HOST)
+    await asf_api.confirm_main()
+
     return True
 
 

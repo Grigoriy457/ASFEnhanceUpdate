@@ -28,7 +28,7 @@ class ASFError(Exception):
 
 class AsfApi:
     def __init__(self, host):
-        self.base_api_url = f"http://{host}/Api"
+        self.base_api_url = f"https://{host}/Api"
         self.password = config.ASF_PASSWORD
 
     async def get_bots(self):
@@ -80,7 +80,7 @@ class AsfApi:
         if not ret.success:
             raise ASFError(f"ASF loot error: {ret.result}")
 
-    async def confirm_all(self):
+    async def confirm(self, bot):
         headers = {
             "accept": "application/json",
             "Authentication": self.password,
@@ -90,13 +90,19 @@ class AsfApi:
             "Accept": True
         }
         async with aiohttp.ClientSession() as session:
-            async with session.post(f"{self.base_api_url}/Bot/ASF/TwoFactorAuthentication/Confirmations", headers=headers, data=json.dumps(data)) as response:
+            async with session.post(f"{self.base_api_url}/Bot/{bot}/TwoFactorAuthentication/Confirmations", headers=headers, data=json.dumps(data)) as response:
                 if response.status in (500, 503):
                     raise ASFError(f"ASF is not available. Status code: {response.status} (confirm_all)")
 
                 data = await response.json()
                 if not data["Success"]:
                     raise ASFError(f"ASF confirm error: {data['Message']}")
+
+    async def confirm_all(self):
+        return self.confirm("ASF")
+
+    async def confirm_main(self):
+        return await self.confirm(config.ASF_MAIN_BOT_NAME)
 
 
 async def test():
