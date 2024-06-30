@@ -3,19 +3,19 @@ import logging
 
 config = dotenv_values(".env")
 
-ASF_HOSTS = config.get("ASF_HOSTS").split(",")
-ASF_PASSWORD = config.get("ASF_PASSWORD")
+ASF_HOSTS = config["ASF_HOSTS"].split(",")
+ASF_PASSWORD = config["ASF_PASSWORD"]
 
-ASF_MAIN_HOST = config.get("ASF_MAIN_HOST")
-ASF_MAIN_BOT_NAME = config.get("ASF_MAIN_BOT_NAME")
+ASF_MAIN_HOST = config["ASF_MAIN_HOST"]
+ASF_MAIN_BOT_NAME = config["ASF_MAIN_BOT_NAME"]
 
 STEAM_ID = config["STEAM_ID"]
-STEAM_SESSION_ID = config.get("STEAM_SESSION_ID")
+STEAM_SESSION_ID = config["STEAM_SESSION_ID"]
 STEAM_LOGIN_SECURE = config["STEAM_LOGIN_SECURE"]
 
-MAX_ATTEMPTS = int(config.get("MAX_ATTEMPTS"))
+MAX_ATTEMPTS = int(config["MAX_ATTEMPTS"])
 PRICE_OFFSET = float(config["PRICE_OFFSET"])
-FARM_AT_UTC_TIME = config.get("FARM_AT_UTC_TIME")
+FARM_AT_UTC_TIME = config["FARM_AT_UTC_TIME"]
 
 LOGGING_LEVEL = logging.INFO
 LOGGING_FORMAT = "%(levelname)s | %(asctime)s | %(name)s (%(filename)s).%(funcName)s(%(lineno)d) -> %(message)s"

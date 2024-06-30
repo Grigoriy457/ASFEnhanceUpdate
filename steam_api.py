@@ -44,7 +44,7 @@ class SteamApi:
             "Accept-Language": "ru-RU,ru;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6",
             "Connection": "keep-alive",
             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-            "Cookie": f"sessionid={self.session_id}; steamLoginSecure={self.login_secure}; steamCountry=RU%7C9c73d4b94187f68d6431b1ba5e41bc79; strInventoryLastContext=753_0; tsTradeOffersLastRead=1719680989",
+            "Cookie": f"sessionid={self.session_id}; steamLoginSecure={self.login_secure}; Steam_Language=russian; birthtime=-3333; steamCountry=RU%7Cf5856c1a5d9c517da5e4a2568504d0e9; strInventoryLastContext=753_0; tsTradeOffersLastRead=1719680989",
             "DNT": "1",
             "Host": "steamcommunity.com",
             "Origin": "https://steamcommunity.com",

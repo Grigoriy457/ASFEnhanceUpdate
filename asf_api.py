@@ -104,6 +104,22 @@ class AsfApi:
     async def confirm_main(self):
         return await self.confirm(config.ASF_MAIN_BOT_NAME)
 
+    async def get_twofactor_code(self, bot_name):
+        headers = {
+            "accept": "application/json",
+            "Authentication": self.password,
+            "Content-Type": "application/json"
+        }
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"{self.base_api_url}/Bot/{bot_name}/TwoFactorAuthentication/Token", headers=headers) as response:
+                if response.status in (500, 503):
+                    raise ASFError(f"ASF is not available. Status code: {response.status} (two_factor_authentication)")
+
+                data = await response.json()
+                if not data["Success"]:
+                    raise ASFError(f"ASF two factor authentication error: {data['Message']}")
+                return data["Result"][bot_name]["Result"]
+
 
 async def test():
     asf_api = AsfApi("10.10.10.57:80")
