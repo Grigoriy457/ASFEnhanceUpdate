@@ -3,6 +3,7 @@ import logging
 
 config = dotenv_values(".env")
 
+ASF_PROTOCOL = config["ASF_PROTOCOL"]
 ASF_HOSTS = config["ASF_HOSTS"].split(",")
 ASF_PASSWORD = config["ASF_PASSWORD"]
 
