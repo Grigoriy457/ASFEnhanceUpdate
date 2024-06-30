@@ -28,7 +28,7 @@ class ASFError(Exception):
 
 class AsfApi:
     def __init__(self, host):
-        self.base_api_url = f"https://{host}/Api"
+        self.base_api_url = f"{config.ASF_PROTOCOL}://{host}/Api"
         self.password = config.ASF_PASSWORD
 
     async def get_bots(self):
