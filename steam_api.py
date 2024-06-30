@@ -82,13 +82,14 @@ class SteamApi:
                 return items
 
     async def sell_item(self, asset_id: str, price: int) -> SellItem:
+        new_price = round(price / (1 + config.STEAM_COMMISSION_PERCENTS / 100))
         data = {
             "sessionid": self.session_id,
             "appid": self.app_id,
             "contextid": self.context_id,
             "assetid": asset_id,
-            "amount": "1",
-            "price": str(price)
+            "amount": 1,
+            "price": new_price
         }
         async with aiohttp.ClientSession(headers=self.headers) as session:
             async with session.post(f"{self.base_url}/market/sellitem/", data=aiohttp.FormData(data)) as response:
@@ -112,12 +113,18 @@ class SteamApi:
                 data = await response.json()
                 return round(float(data["lowest_price"].split(" ")[0].replace(",", ".")) * 100 - self.price_offset * 100)
 
+    async def test(self):
+        async with aiohttp.ClientSession(headers=self.headers) as session:
+            async with session.get("https://steamcommunity.com/market/mylistings?count=10") as response:
+                print(await response.text())
+
 
 async def test():
     steam_api = SteamApi()
-    print(await steam_api.get_inventory())
-    price = await steam_api.get_lowest_item_price("2861690-Existential Seagull")
-    print(await steam_api.sell_item("30465340462", price))
+    await steam_api.test()
+    # print(await steam_api.get_inventory())
+    # price = await steam_api.get_lowest_item_price("2861690-Existential Seagull")
+    # print(await steam_api.sell_item("30465340462", price))
 
 
 if __name__ == '__main__':

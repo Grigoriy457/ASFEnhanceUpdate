@@ -14,10 +14,10 @@ async def process(asf_host):
     bots = await asf_api.get_bots()
     online_bots_count = len([bot for bot in bots if bot.is_enabled])
 
-    # await asf_api.explorer()
-    # logger.info(f"[+] Explore ASF {asf_host} done")
-    # await asyncio.sleep(30)
-    # await asf_api.loot()
+    await asf_api.explorer()
+    logger.info(f"[+] Explore ASF {asf_host} done")
+    await asyncio.sleep(30)
+    await asf_api.loot()
     logger.info(f"[+] Loot ASF {asf_host} done")
 
     return online_bots_count
